@@ -1,17 +1,17 @@
 function debounce(func, wait) {
     let timeout;
-  
+
     return function executedFunction(...args) {
       const later = () => {
         clearTimeout(timeout);
         func(...args);
       };
-  
+
       clearTimeout(timeout);
       timeout = setTimeout(later, wait);
     };
   }
-  
+
     function checkForComposeBox() {
         const composeBox = document.querySelector('div[aria-label="Message Body"]');
         if (composeBox) {
@@ -72,42 +72,121 @@ function debounce(func, wait) {
             statusIcon.src = isSensitive ? chrome.runtime.getURL('img/unsafe.png') : chrome.runtime.getURL('img/safe.png');
         }
     }
-  
-  // ... (rest of your content.js file)
 
-function detectSensitiveInformation(text) {
-    showLoadingIcon();
+    function stringToColor(str) {
+        console.log('Generating color for string:', str); // Debug: Check the input string
+        let hash = 0;
+        for (let i = 0; i < str.length; i++) {
+            hash = str.charCodeAt(i) + ((hash << 5) - hash);
+        }
+        console.log('Hash generated:', hash); // Debug: Check the generated hash
 
-    fetch('http://localhost:5000/classify', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ text: text })
-    })
-    .then(response => response.json())
-    .then(data => {
-        console.log('Entities:', data);
-        updateStatusIcon(data.length > 0);
-        hideLoadingIcon();
+        let color = '#';
+        for (let i = 0; i < 3; i++) {
+            // Ensure each color component is at least 127 (halfway to 255)
+            let value = ((hash >> (i * 8)) & 0xFF) + 127;
+            // If the value goes beyond 255, wrap it around
+            value = value % 256;
+            // If the value is less than 127, make it bright by setting a minimum threshold
+            if (value < 127) {
+                value = 127;
+            }
+            color += ('00' + value.toString(16)).substr(-2);
+        }
+        console.log('Color generated:', color); // Debug: Check the generated color
+        return color;
+    }
 
-        // Send the detected entities to the popup
-        chrome.runtime.sendMessage({ status: data.length > 0 ? 'unsafe' : 'safe', entities: data });
-    })
-    .catch((error) => {
-        console.error('Error:', error);
-        hideLoadingIcon();
-        // Send the error status to the popup
-        chrome.runtime.sendMessage({ status: 'error', error: error.toString() });
-    });
-}
+    function highlightTextInstances(searchText, highlightColor) {
+        const escapedSearchText = searchText.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+        const searchRegExp = new RegExp('\\b' + escapedSearchText + '\\b', 'gi');
 
-// ... (rest of your content.js file)
+        const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null, false);
+        let node;
+        while ((node = walker.nextNode())) {
+            if (node.parentNode.nodeName === 'SPAN' && node.parentNode.classList.contains('highlight')) {
+                continue;
+            }
 
-  
+            const matches = [...node.nodeValue.matchAll(searchRegExp)];
+            for (const match of matches) {
+                const matchText = match[0];
+                const matchStart = match.index;
+                const matchEnd = matchStart + matchText.length;
+
+                const endNode = node.splitText(matchStart);
+                const middleNode = endNode.splitText(matchText.length);
+
+                const highlightSpan = document.createElement('span');
+                highlightSpan.classList.add('highlight');
+                highlightSpan.style.backgroundColor = highlightColor;
+                highlightSpan.textContent = matchText;
+
+                endNode.parentNode.replaceChild(highlightSpan, endNode);
+
+                node = middleNode;
+            }
+        }
+    }
+
+    let currentHighlights = [];
+
+    function updateHighlights(newEntities) {
+        currentHighlights.forEach((entity) => {
+            if (!newEntities.some(e => e[1] === entity[1])) {
+                removeHighlight(entity[1]);
+            }
+        });
+
+        newEntities.forEach((entity) => {
+            const color = stringToColor(entity[0]);
+            highlightTextInstances(entity[1], color);
+        });
+
+        currentHighlights = newEntities;
+    }
+
+    function removeHighlight(text) {
+        document.querySelectorAll('.highlight').forEach((highlight) => {
+            if (highlight.textContent === text) {
+                const parent = highlight.parentNode;
+                parent.replaceChild(document.createTextNode(text), highlight);
+                parent.normalize();
+            }
+        });
+    }
+
+    function detectSensitiveInformation(text) {
+        showLoadingIcon();
+
+        fetch('http://localhost:5000/classify', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ text: text })
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log('Entities:', data);
+            updateStatusIcon(data.length > 0);
+            hideLoadingIcon();
+
+            updateHighlights(data);
+
+            chrome.runtime.sendMessage({ status: data.length > 0 ? 'unsafe' : 'safe', entities: data });
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+            hideLoadingIcon();
+            chrome.runtime.sendMessage({ status: 'error', error: error.toString() });
+        });
+    }
+
+
   // Debounce the detectSensitiveInformation function
     debouncedDetectSensitiveInformation = debounce(detectSensitiveInformation, 2000);
-  
+
   if (!window.hasObserver) {
       const observer = new MutationObserver((mutations) => {
           mutations.forEach((mutation) => {
@@ -116,19 +195,18 @@ function detectSensitiveInformation(text) {
               }
           });
       });
-  
+
       observer.observe(document.body, { childList: true, subtree: true });
       window.hasObserver = true;
   }
-  
+
   // Listen for changes in the compose box with debounced function
   document.addEventListener('input', (event) => {
       if (event.target.matches('div[aria-label="Message Body"]')) {
           debouncedDetectSensitiveInformation(event.target.innerText);
       }
   });
-  
+
   // Initial check when the script is injected
   checkForComposeBox();
   insertStatusIcon();
-  
