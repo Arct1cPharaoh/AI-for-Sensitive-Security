@@ -1,0 +1,87 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    border-radius: 15px;
+    padding: 20px; /* Added padding */
+    background-color: #f8f9fa;
+    color: #333; /* text color */
+    width: 340px; /* Adjusted width */
+    font-size: 20px; /* Larger font size */
+    /* Rounded corners for the popup */
+    /* Removed box-shadow */
+}
+
+
+.status {
+    margin-top: 20px;
+    padding: 10px;
+    border-radius: 5px;
+    text-align: center;
+    font-size: 16px; /* Larger font size */
+    font-weight: normal; /* Reset bold */
+}
+
+.title {
+    text-align: center;
+    font-size: 28px; /* Much larger title */
+    font-weight: bold; /* Thicker font */
+    margin-bottom: 20px;
+}
+
+.safe, .unsafe, .neutral {
+    border-radius: 10px; /* Rounded edges */
+    border: 1px solid #ddd; /* Border added */
+    padding: 15px;
+    margin: 10px 0;
+    font-weight: normal; /* Reset bold */
+}
+
+.unsafe {
+    font-weight: bold; /* Bold for unsafe status */
+}
+
+.neutral {
+    background-color: #d1ecf1;
+    color: #0c5460;
+}
+
+.entities {
+    margin-top: 10px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background-color: #fff;
+    max-height: 330px; /* Adjusted height */
+    overflow-y: auto;
+    font-size: 16px; /* Larger font size */
+}
+
+.entities-list {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+.entities-list li {
+    margin-bottom: 5px;
+    padding: 5px;
+    border-bottom: 1px solid #eee;
+}
+
+.entities-list li:last-child {
+    border-bottom: none;
+}
+
+/* Specific styles for the PASSWORD entity */
+.password-entity {
+    font-weight: normal; /* Less thick font */
+    font-size: 16px; /* Slightly smaller font size */
+}
+
+.password-entity .entity-type {
+    color: red; /* Red color for the entity type */
+}
+
+.password-entity .entity-value {
+    color: black; /* Black color for the entity value */
+}

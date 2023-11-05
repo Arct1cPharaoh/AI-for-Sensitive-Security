@@ -24,10 +24,12 @@ function updateStatusBasedOnTab(tab) {
     }
 }
 
-// Listen for messages from content script
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-    if (message.status) {
-        currentStatus = message.status;
+    if (message.query === 'getStatus') {
+        sendResponse(currentStatus);
+    } else if (message.status) {
+        // Update the current status based on messages from content scripts
+        currentStatus = { status: message.status, entities: message.entities || [] };
     }
 });
 

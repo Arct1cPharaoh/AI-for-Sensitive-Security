@@ -4,40 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI for Sensitive Security</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 10px;
-            background-color: #f8f9fa;
-            color: #333;
-        }
-        .status {
-            margin-top: 20px;
-            padding: 10px;
-            border-radius: 5px;
-            text-align: center;
-        }
-        .safe {
-            background-color: #d4edda;
-            color: #155724;
-        }
-        .unsafe {
-            background-color: #f8d7da;
-            color: #721c24;
-        }
-        .neutral {
-            background-color: #d1ecf1;
-            color: #0c5460;
-        }
-    </style>
+    <link rel="stylesheet" href="popup-style.css">
 </head>
 <body>
-    <h2>Email Security Status</h2>
+    <div class="title">Email Security Status</div>
     <div id="status" class="status neutral">
         No email open.
     </div>
-
+    <div id="entities" class="entities">
+        <ul class="entities-list">
+            <!-- Entities will be added here -->
+        </ul>
+    </div>
     <script src="popup.js"></script>
 </body>
 </html>

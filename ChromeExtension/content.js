@@ -12,13 +12,13 @@ function debounce(func, wait) {
     };
   }
   
-  function checkForComposeBox() {
-      const composeBox = document.querySelector('div[aria-label="Message Body"]');
-      if (composeBox) {
-          // Detected compose box, now check for sensitive information
-          debouncedDetectSensitiveInformation(composeBox.innerText);
-      }
-  }
+    function checkForComposeBox() {
+        const composeBox = document.querySelector('div[aria-label="Message Body"]');
+        if (composeBox) {
+            // Detected compose box, now check for sensitive information
+            debouncedDetectSensitiveInformation(composeBox.innerText);
+        }
+    }
 
     function insertStatusIcon() {
         const composeBox = document.querySelector('div[aria-label="Message Body"]');
@@ -73,37 +73,37 @@ function debounce(func, wait) {
         }
     }
   
-  function detectSensitiveInformation(text) {
-      showLoadingIcon();
-  
-      // INSERT LOGIC HERE
-      let isSensitive = text.includes("qwerty"); // Temporary (For Testing Purposes Only)
-  
-      // Updates Icon to stop loading and indicate safety of text
-      updateStatusIcon(isSensitive);
-      hideLoadingIcon();
-  
-      if (isSensitive) {
-          chrome.runtime.sendMessage({ status: 'unsafe' });
-      } else {
-          chrome.runtime.sendMessage({ status: 'safe' });
-      }
-  
-      fetch('http://localhost:5000/classify', {
-          method: 'POST',
-          headers: {
-              'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({ text: text })
-      })
-      .then(response => response.json())
-      .then(data => {
-          console.log('Entities:', data);
-      })
-      .catch((error) => {
-          console.error('Error:', error);
-      });
-  }
+  // ... (rest of your content.js file)
+
+function detectSensitiveInformation(text) {
+    showLoadingIcon();
+
+    fetch('http://localhost:5000/classify', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ text: text })
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log('Entities:', data);
+        updateStatusIcon(data.length > 0);
+        hideLoadingIcon();
+
+        // Send the detected entities to the popup
+        chrome.runtime.sendMessage({ status: data.length > 0 ? 'unsafe' : 'safe', entities: data });
+    })
+    .catch((error) => {
+        console.error('Error:', error);
+        hideLoadingIcon();
+        // Send the error status to the popup
+        chrome.runtime.sendMessage({ status: 'error', error: error.toString() });
+    });
+}
+
+// ... (rest of your content.js file)
+
   
   // Debounce the detectSensitiveInformation function
     debouncedDetectSensitiveInformation = debounce(detectSensitiveInformation, 2000);
