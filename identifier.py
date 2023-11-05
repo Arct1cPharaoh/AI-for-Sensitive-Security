@@ -60,8 +60,3 @@ def identify_sensitive_entities(text):
 
     # Return the list of entities
     return entities
-
-# text_to_analyze = "My email is terrere@gmail.com, and my phone number is 802-379-5555. I am Joseph Terreri, and I live in New York City. My password is zachisgay. my ssn is 008884353."
-# identified_entities = identify_sensitive_entities(text_to_analyze)
-# for entity_type, entity_text in identified_entities:
-#     print(f"{entity_type} - {entity_text}")
