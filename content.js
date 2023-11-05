@@ -61,10 +61,10 @@ function updateStatusIcon(isSensitive) {
 
 function detectSensitiveInformation(text) {
     showLoadingIcon();
-    
+
     // INSERT LOGIC HERE
     let isSensitive = text.includes("qwerty"); // Temporary (For Testing Purposes Only)
-    
+
     // Updates Icon to stop loading and indicate safety of text
     updateStatusIcon(isSensitive);
     hideLoadingIcon();
@@ -74,6 +74,21 @@ function detectSensitiveInformation(text) {
     } else {
         chrome.runtime.sendMessage({ status: 'safe' });
     }
+
+    fetch('http://localhost:5000/classify', {
+        method: 'POST',
+        headers: {
+        'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ text: text })
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log('Entities:', data);
+    })
+    .catch((error) => {
+        console.error('Error:', error);
+    });
 }
 
 if (!window.hasObserver) {
