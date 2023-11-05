@@ -59,6 +59,48 @@ function updateStatusIcon(isSensitive) {
     }
 }
 
+function stringToColor(str) {
+    // Create a hash from the string
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+        hash = str.charCodeAt(i) + ((hash << 5) - hash);
+    }
+
+    // Convert the hash into an RGB color
+    let color = '#';
+    for (let i = 0; i < 3; i++) {
+        let value = (hash >> (i * 8)) & 0xFF;
+        color += ('00' + value.toString(16)).substr(-2);
+    }
+    return color;
+}
+
+function highlightText(text, color) {
+    // Create a new span element to wrap the highlighted text
+    const span = document.createElement('span');
+    span.style.backgroundColor = color;
+    span.textContent = text;
+
+    // Use a Range and the find() method to locate the text in the document
+    const range = document.createRange();
+    const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null, false);
+
+    let node;
+    while ((node = walker.nextNode())) {
+        if (node.nodeValue.includes(text)) {
+            range.setStart(node, node.nodeValue.indexOf(text));
+            range.setEnd(node, node.nodeValue.indexOf(text) + text.length);
+
+            // Replace the text with the new span element
+            range.deleteContents();
+            range.insertNode(span);
+
+            // Break after the first match to avoid multiple highlights
+            break;
+        }
+    }
+}
+
 function detectSensitiveInformation(text) {
     showLoadingIcon();
 
@@ -75,20 +117,29 @@ function detectSensitiveInformation(text) {
         chrome.runtime.sendMessage({ status: 'safe' });
     }
 
-    fetch('http://localhost:5000/classify', { // Need to change this to the actual URL
+    fetch('http://localhost:5000/classify', {
         method: 'POST',
         headers: {
-        'Content-Type': 'application/json'
+            'Content-Type': 'application/json'
         },
         body: JSON.stringify({ text: text })
     })
     .then(response => response.json())
     .then(data => {
-        console.log('Entities:', data);
+        console.log('Full response data:', data); // This will show you the full structure of the response
+
+        for (let i = 0; i < data.length; i++) {
+            let entity = data[i];
+            console.log(`Entity Type: ${entity[0]}, Text: ${entity[1]}`);
+            //let color = stringToColor(entity[0]);
+            //console.log(`Entity Type: ${entity[0]}, Text: ${entity[1]}, Color: ${color}`);
+            //highlightText(entity[1], color);
+        }
     })
-    .catch((error) => {
-        //console.error('Error:', error);
+    .catch(error => {
+        console.error('Error:', error);
     });
+
 }
 
 if (!window.hasObserver) {
