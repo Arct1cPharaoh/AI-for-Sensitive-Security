@@ -75,7 +75,7 @@ function detectSensitiveInformation(text) {
         chrome.runtime.sendMessage({ status: 'safe' });
     }
 
-    fetch('http://localhost:5000/classify', {
+    fetch('http://localhost:5000/classify', { // Need to change this to the actual URL
         method: 'POST',
         headers: {
         'Content-Type': 'application/json'
@@ -87,7 +87,7 @@ function detectSensitiveInformation(text) {
         console.log('Entities:', data);
     })
     .catch((error) => {
-        console.error('Error:', error);
+        //console.error('Error:', error);
     });
 }
 
