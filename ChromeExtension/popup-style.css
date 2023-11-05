@@ -2,13 +2,11 @@ body {
     font-family: Arial, sans-serif;
     margin: 0;
     border-radius: 15px;
-    padding: 20px; /* Added padding */
+    padding: 20px;
     background-color: #f8f9fa;
-    color: #333; /* text color */
-    width: 340px; /* Adjusted width */
-    font-size: 20px; /* Larger font size */
-    /* Rounded corners for the popup */
-    /* Removed box-shadow */
+    color: #333;
+    width: 340px;
+    font-size: 20px;
 }
 
 
@@ -46,8 +44,8 @@ body {
 }
 
 .entities {
-    margin-top: 10px;
-    padding: 10px;
+    padding-top: 10px;
+    padding-bottom: 10px;
     border: 1px solid #ddd;
     border-radius: 5px;
     background-color: #fff;
@@ -63,25 +61,29 @@ body {
 }
 
 .entities-list li {
-    margin-bottom: 5px;
+    margin-bottom: 10px; /* Adjust this value to increase or decrease the space */
+    margin-top: 10px;
     padding: 5px;
-    border-bottom: 1px solid #eee;
+    /* border-bottom removed */
+    font-size: 16px; /* Consistent font size for all items */
+}
+
+.entities-list li:first-child {
+    margin-top: 0; /* Remove top margin for the first item */
 }
 
 .entities-list li:last-child {
-    border-bottom: none;
+    margin-bottom: 0; /* Remove bottom margin for the last item */
 }
+
 
 /* Specific styles for the PASSWORD entity */
-.password-entity {
-    font-weight: normal; /* Less thick font */
-    font-size: 16px; /* Slightly smaller font size */
-}
-
 .password-entity .entity-type {
     color: red; /* Red color for the entity type */
+    font-weight: bold; /* Bold for entity type */
 }
 
 .password-entity .entity-value {
     color: black; /* Black color for the entity value */
+    font-weight: normal; /* Normal weight for entity value */
 }

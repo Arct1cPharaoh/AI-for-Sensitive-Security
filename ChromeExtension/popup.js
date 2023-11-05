@@ -30,5 +30,23 @@ document.addEventListener('DOMContentLoaded', () => {
             statusDiv.textContent = "No email open.";
             entitiesList.innerHTML = ""; // Clear previous entities
         }
+
+        toggleEntityListVisibility();
     });
 });
+
+
+// This function checks if the entity list is empty and hides the container if it is
+function toggleEntityListVisibility() {
+    const entityListContainer = document.querySelector('.entities');
+    const entityList = document.querySelector('.entities-list');
+
+    // Check if the entity list has any list items
+    if (entityList && entityList.children.length === 0) {
+        // If there are no items, hide the container
+        entityListContainer.style.display = 'none';
+    } else {
+        // If there are items, show the container
+        entityListContainer.style.display = 'block';
+    }
+}
