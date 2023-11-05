@@ -77,11 +77,13 @@ function debounce(func, wait) {
         console.log('Generating color for string:', str); // Debug: Check the input string
         let hash = 0;
         for (let i = 0; i < str.length; i++) {
-            hash = str.charCodeAt(i) + ((hash << 5) - hash);
+            hash = str.charCodeAt(i) + ((hash << 7) - hash);
         }
         console.log('Hash generated:', hash); // Debug: Check the generated hash
 
-        let color = '#';
+        // Initialize RGB values
+        let r = 0, g = 0, b = 0;
+
         for (let i = 0; i < 3; i++) {
             // Ensure each color component is at least 127 (halfway to 255)
             let value = ((hash >> (i * 8)) & 0xFF) + 127;
@@ -91,8 +93,18 @@ function debounce(func, wait) {
             if (value < 127) {
                 value = 127;
             }
-            color += ('00' + value.toString(16)).substr(-2);
+            // Assign the value to the appropriate RGB component
+            if (i === 0) r = value;
+            else if (i === 1) g = value;
+            else if (i === 2) b = value;
         }
+
+        // Set the alpha value for semi-transparency
+        let alpha = 0.5; // Semi-transparent
+
+        // Construct the RGBA color string
+        let color = `rgba(${r}, ${g}, ${b}, ${alpha})`;
+
         console.log('Color generated:', color); // Debug: Check the generated color
         return color;
     }
