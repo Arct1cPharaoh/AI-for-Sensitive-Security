@@ -7,13 +7,8 @@ function checkForComposeBox() {
 }
 
 function detectSensitiveInformation(text) {
-    // REPLACE WITH ACTUAL LOGIC HERE
-    // Temporary Test
-    let isSensitive = false;
-    if (text.includes("qwerty")) { // Changed from strict equality to 'includes'
-        isSensitive = true;
-    }
-    
+    let isSensitive = text.includes("qwerty");
+
     if (isSensitive) {
         chrome.runtime.sendMessage({ status: 'unsafe' });
     } else {
@@ -38,3 +33,6 @@ document.addEventListener('input', (event) => {
         detectSensitiveInformation(event.target.innerText);
     }
 });
+
+// Initial check when the script is injected
+checkForComposeBox();

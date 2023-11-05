@@ -1,17 +1,28 @@
 let currentStatus = 'off'; // Three statuses are 'off', 'safe', and 'unsafe'
 
-function checkIfGmail(tabId, changeInfo, tab) {
+chrome.tabs.onActivated.addListener(function(activeInfo) {
+    chrome.tabs.get(activeInfo.tabId, function(tab) {
+        updateStatusBasedOnTab(tab);
+    });
+});
+
+chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
+    updateStatusBasedOnTab(tab);
+});
+
+function updateStatusBasedOnTab(tab) {
     if (tab.url && tab.url.includes("mail.google.com")) {
         // User is on Gmail
         currentStatus = 'safe';
+        chrome.scripting.executeScript({
+            target: { tabId: tab.id },
+            files: ['content.js']
+        });
     } else {
         // User is not on Gmail
         currentStatus = 'off';
     }
 }
-
-// Listen for any changes in the tabs
-chrome.tabs.onUpdated.addListener(checkIfGmail);
 
 // Listen for messages from content script
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
