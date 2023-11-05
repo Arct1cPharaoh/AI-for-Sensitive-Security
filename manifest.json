@@ -8,19 +8,24 @@
         "scripting"
     ],
     "host_permissions": [
-        "*://mail.google.com/*",
-        "*://outlook.live.com/*"
+        "*://mail.google.com/*"
     ],
     "action": {
         "default_popup": "popup.html"
     },
     "content_scripts": [
         {
-            "matches": ["*://mail.google.com/*", "*://outlook.live.com/*"],
+            "matches": ["*://mail.google.com/*"],
             "js": ["content.js"]
         }
     ],
     "background": {
         "service_worker": "background.js"
-    }
+    },
+    "web_accessible_resources": [
+        {
+            "resources": ["img/safe.png", "img/unsafe.png", "img/loading.gif"],
+            "matches": ["*://mail.google.com/*"]
+        }
+    ]
 }
